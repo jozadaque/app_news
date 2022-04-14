@@ -1,3 +1,5 @@
+import 'package:app_news/src/datasources/client_dio.dart';
+import 'package:app_news/src/stories/news_store.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
@@ -8,6 +10,25 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  NewsStories newsStories = NewsStories(ClientDio());
+
+  @override
+  void initState() {
+    super.initState();
+    newsStories.getNews();
+    newsStories.addListener(listeners);
+  }
+
+  void listeners() {
+    setState(() {});
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    newsStories.removeListener(listeners);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,7 +62,71 @@ class _HomePageState extends State<HomePage> {
                 ],
               ),
             ),
-            Column(),
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 0.83,
+              child: ListView.builder(
+                itemCount: newsStories.news.length,
+                itemBuilder: (_, index) {
+                  return Column(
+                    children: [
+                      Container(
+                          child: Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              width: double.parse(
+                                      newsStories.news[index].picWidth) *
+                                  0.65,
+                              height: double.parse(
+                                  newsStories.news[index].picHeight),
+                              child: Image.network(
+                                'https://www.vagalume.com.br${newsStories.news[index].picSrc}',
+                                fit: BoxFit.fill,
+                              ),
+                            ),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8.0),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(
+                                    width: MediaQuery.of(context).size.width *
+                                        0.46,
+                                    child: Text(
+                                      newsStories.news[index].featured,
+                                      overflow: TextOverflow.clip,
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.w900),
+                                    ),
+                                  ),
+                                  Container(
+                                    width: MediaQuery.of(context).size.width *
+                                        0.45,
+                                    child: Text(
+                                      newsStories.news[index].headline,
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.w400),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
+                      )),
+                      Container(
+                        color: Colors.black12,
+                        height: 1,
+                      )
+                    ],
+                  );
+                },
+              ),
+            ),
           ],
         ),
       ),
